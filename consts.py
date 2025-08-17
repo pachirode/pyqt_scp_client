@@ -20,8 +20,8 @@ class CMDS:
     SSH_KILL_NIX = "killall ssh"
     SSH_KILL_WIN = "taskkill /im ssh.exe /t /f"
     SCP = "scp"
-    SCP_UPLOAD_TEMPLATE = "scp -r {} {}:{}"
-    SCP_DOWNLOAD_TEMPLATE = "scp -r {}:{} {}"
+    SCP_UPLOAD_TEMPLATE = " -r {} {}@{}:{}"
+    SCP_DOWNLOAD_TEMPLATE = " -r {}@{}:{} {}"
 
 
 class ICONS:

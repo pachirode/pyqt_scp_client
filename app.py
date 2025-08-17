@@ -5,21 +5,22 @@ import sys
 import time
 
 import yaml
-from PyQt5.QtCore import QProcess
+import paramiko
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QApplication, QDialog, QMessageBox, QGridLayout, QPushButton, QFileDialog
 
 from deepdiff import DeepDiff
 
-from consts import CONFIG_FILE, LANGUAGE
+from consts import CONFIG_FILE, LANGUAGE, CMDS
 from ssh import Ui_SSH
 from sshconfig import Ui_SSHConfig
 
 
 class SSHConfig(QDialog):
-    def __init__(self, parent, data):
+    def __init__(self, parent, data, name):
         super(SSHConfig, self).__init__(parent)
 
+        self.name = name
         self.ui = Ui_SSHConfig()
         self.ui.setupUi(self)
         self.ui.Remote_ip_edit.setText(data.get("ip"))
@@ -31,6 +32,64 @@ class SSHConfig(QDialog):
     def open_dir(self):
         directory = QFileDialog.getExistingDirectory(self, "Select Directory")
         self.ui.local_dir_edit.setText(directory)
+
+    def upload(self):
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname=self.ui.local_dir_edit.text(), username=self.name, password="123456")
+        sftp = ssh.open_sftp()
+
+        if os.path.isfile(self.ui.local_dir_edit.text()):
+            filename = os.path.basename(self.ui.local_dir_edit.text())
+            remote_file_path = f"{self.ui.Remote_dir_edit.text()}/{filename}".replace("\\", "/")
+            sftp.put(self.ui.local_dir_edit.text(), remote_file_path)
+        elif os.path.isdir(self.ui.local_dir_edit.text()):
+            self._upload_directory(sftp, self.ui.local_dir_edit.text(), self.ui.Remote_dir_edit.text())
+
+        sftp.close()
+        ssh.close()
+
+    def _upload_directory(self, sftp, local_dir, remote_dir):
+        try:
+            sftp.mkdir(remote_dir)
+        except:
+            pass
+        for item in os.listdir(local_dir):
+            local_path = os.path.join(local_dir, item)
+            remote_path = f"{remote_dir}/{item}".replace("\\", "/")
+
+            if os.path.isfile(local_path):
+                sftp.put(local_path, remote_path)
+            elif os.path.isdir(local_path):
+                self._upload_directory(
+                    sftp,
+                    local_path,
+                    remote_path
+                )
+
+    def download(self):
+        self._download_with_paramiko()
+
+    def _download_with_paramiko(self):
+        try:
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+            ssh.connect(hostname=self.ui.Remote_ip_edit.text(), username=self.name, password="123456")
+
+            sftp = ssh.open_sftp()
+
+            filename = os.path.basename(self.ui.Remote_dir_edit.text())
+            local_file_path = os.path.join(self.ui.local_dir_edit.text(), filename)
+            sftp.get(self.ui.Remote_dir_edit.text(), local_file_path)
+
+            sftp.close()
+            ssh.close()
+
+            print("Download completed successfully")
+
+        except Exception as e:
+            print(f"Download failed: {str(e)}")
 
     def as_dict(self):
         return {
@@ -47,11 +106,10 @@ class SSH(QWidget):
         self.ui = Ui_SSH()
         self.ui.setupUi(self)
 
-        self.ssh_config = SSHConfig(self, data)
+        self.ssh_config = SSHConfig(self, data, name)
         self.ssh_config.setWindowTitle(name)
         self.ssh_config.setModal(True)
         self.ui.name.setText(name)
-
         self.ssh_config.icon = f"./icons/{name}.svg"
 
         if not os.path.exists(self.ssh_config.icon):
@@ -65,11 +123,10 @@ class SSH(QWidget):
         self.process = None
 
     def upload(self):
-        self.process = QProcess()
-
+        self.ssh_config.upload()
 
     def download(self):
-        pass
+        self.ssh_config.download()
 
 
 class SSHManager(QWidget):

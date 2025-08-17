@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SSHConfig</class>
+ <widget class="QDialog" name="SSHConfig">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>508</width>
+    <height>141</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="3" column="3">
+    <widget class="QPushButton" name="Download_Button">
+     <property name="text">
+      <string>Download</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="Upload_Button">
+     <property name="text">
+      <string>Upload</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="Local_dir">
+     <property name="text">
+      <string>Local Dir</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLineEdit" name="local_dir_edit"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="openDirButton">
+       <property name="text">
+        <string>Open</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="Remote_directory">
+     <property name="text">
+      <string>Remote Dir</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2" colspan="2">
+    <widget class="QLineEdit" name="Remote_dir_edit">
+     <property name="font">
+      <font>
+       <family>Monospace</family>
+      </font>
+     </property>
+     <property name="placeholderText">
+      <string>/home/{user}/Templates</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="Remote_address">
+     <property name="text">
+      <string>Remote Address</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2" colspan="2">
+    <widget class="QLineEdit" name="Remote_ip_edit"/>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>Remote_dir_edit</tabstop>
+  <tabstop>Download_Button</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

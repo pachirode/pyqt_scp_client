@@ -32,7 +32,7 @@ jobs:
       id: upload-linux
       uses: actions/upload-release-asset@v1.0.0
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./uploads/ssh-client-linux.bin
@@ -42,7 +42,7 @@ jobs:
       id: upload-windows
       uses: actions/upload-release-asset@v1.0.0
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./uploads/ssh-client-windows.exe

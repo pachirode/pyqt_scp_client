@@ -1,8 +1,10 @@
 import glob
 import os.path
 import shutil
+import stat
 import sys
 import time
+from pathlib import Path
 
 import yaml
 import paramiko
@@ -11,7 +13,7 @@ from PyQt5.QtWidgets import QWidget, QApplication, QDialog, QMessageBox, QGridLa
 
 from deepdiff import DeepDiff
 
-from consts import CONFIG_FILE, LANGUAGE, CMDS
+from consts import CONFIG_FILE, LANGUAGE, History, ICONS
 from ssh import Ui_SSH
 from sshconfig import Ui_SSHConfig
 
@@ -36,7 +38,7 @@ class SSHConfig(QDialog):
     def upload(self):
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname=self.ui.local_dir_edit.text(), username=self.name, password="123456")
+        ssh.connect(hostname=self.ui.Remote_ip_edit.text(), username=self.name, password="123456")
         sftp = ssh.open_sftp()
 
         if os.path.isfile(self.ui.local_dir_edit.text()):
@@ -46,6 +48,7 @@ class SSHConfig(QDialog):
         elif os.path.isdir(self.ui.local_dir_edit.text()):
             self._upload_directory(sftp, self.ui.local_dir_edit.text(), self.ui.Remote_dir_edit.text())
 
+        print("Upload successfully!")
         sftp.close()
         ssh.close()
 
@@ -61,6 +64,9 @@ class SSHConfig(QDialog):
             if os.path.isfile(local_path):
                 sftp.put(local_path, remote_path)
             elif os.path.isdir(local_path):
+                filename = Path(local_path).stem
+                if filename == ".git" or filename == ".idea" or filename == "__pycache__":
+                    continue
                 self._upload_directory(
                     sftp,
                     local_path,
@@ -71,25 +77,39 @@ class SSHConfig(QDialog):
         self._download_with_paramiko()
 
     def _download_with_paramiko(self):
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        ssh.connect(hostname=self.ui.Remote_ip_edit.text(), username=self.name, password="123456")
+
+        sftp = ssh.open_sftp()
+
+        if not os.path.exists(self.ui.local_dir_edit.text()):
+            os.makedirs(self.ui.local_dir_edit.text())
+
+        files = self.get_remote_files(sftp, self.ui.Remote_dir_edit.text())
+
+        for file in files:
+            local_path = os.path.join(self.ui.local_dir_edit.text(), os.path.basename(file))
+            sftp.get(file, local_path)
+
+        sftp.close()
+        ssh.close()
+
+        print("Download completed successfully")
+
+    def get_remote_files(self, sftp, remote_dir):
+        file_list = sftp.listdir_attr(remote_dir)
         try:
-            ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-            ssh.connect(hostname=self.ui.Remote_ip_edit.text(), username=self.name, password="123456")
-
-            sftp = ssh.open_sftp()
-
-            filename = os.path.basename(self.ui.Remote_dir_edit.text())
-            local_file_path = os.path.join(self.ui.local_dir_edit.text(), filename)
-            sftp.get(self.ui.Remote_dir_edit.text(), local_file_path)
-
-            sftp.close()
-            ssh.close()
-
-            print("Download completed successfully")
-
+            for file in file_list:
+                if stat.S_ISDIR(file.st_mode):
+                    dir = remote_dir + "/" + file.filename
+                    yield from self.get_remote_files(sftp, dir)
+                else:
+                    yield remote_dir + "/" + file.filename
         except Exception as e:
-            print(f"Download failed: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
 
     def as_dict(self):
         return {
@@ -110,10 +130,10 @@ class SSH(QWidget):
         self.ssh_config.setWindowTitle(name)
         self.ssh_config.setModal(True)
         self.ui.name.setText(name)
-        self.ssh_config.icon = f"./icons/{name}.svg"
+        self.ssh_config.icon = f"{ICONS.Prefix}/{name}.svg"
 
         if not os.path.exists(self.ssh_config.icon):
-            self.ssh_config.icon = "./icons/debain.svg"
+            self.ssh_config.icon = f"{ICONS.Prefix}/debain.svg"
 
         self.ui.icon.setPixmap(QPixmap(self.ssh_config.icon))
         self.ui.action_upload.clicked.connect(self.upload)
@@ -123,10 +143,28 @@ class SSH(QWidget):
         self.process = None
 
     def upload(self):
-        self.ssh_config.upload()
+        try:
+            self.ssh_config.upload()
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            mb = QMessageBox()
+            mb.setText(str(e))
+            mb.setWindowTitle(LANGUAGE.OOPS)
+            mb.setStandardButtons(QMessageBox.Close)
+            mb.show()
 
     def download(self):
-        self.ssh_config.download()
+        try:
+            self.ssh_config.download()
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            mb = QMessageBox()
+            mb.setText(str(e))
+            mb.setWindowTitle(LANGUAGE.OOPS)
+            mb.setStandardButtons(QMessageBox.Close)
+            mb.show()
 
 
 class SSHManager(QWidget):
@@ -160,7 +198,7 @@ class SSHManager(QWidget):
 
         if changed:
             timestamp = int(time.time())
-            shutil.copy(CONFIG_FILE, F"./history/{CONFIG_FILE}-{timestamp}")
+            shutil.copy(CONFIG_FILE, F"{History.Prefix}/{CONFIG_FILE}-{timestamp}")
             with open(CONFIG_FILE, "w") as fp:
                 yaml.dump(data, fp)
             backup_configs = glob.glob(f"{CONFIG_FILE}-*")

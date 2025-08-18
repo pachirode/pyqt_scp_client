@@ -1,3 +1,5 @@
+import os.path
+
 CONFIG_FILE = 'config.yaml'
 
 
@@ -25,6 +27,24 @@ class CMDS:
 
 
 class ICONS:
-    UPLOAD = ':/icons/upload.png'
-    DOWNLOAD = ':/icons/download.png'
-    OPEN = ':/icons/file-open.png'
+    Prefix = "./"
+
+
+class History:
+    Prefix = "./"
+
+
+if os.path.exists("./icons"):
+    ICONS.Prefix = "./icons/"
+elif os.path.exists("./_internal/icons"):
+    ICONS.Prefix = "./_internal/icons"
+else:
+    print("Icons folder not found")
+
+if os.path.exists("./history"):
+    History.Prefix = "./history/"
+elif os.path.exists("./_internal/history"):
+    History.Prefix = "./_internal/history"
+else:
+    os.mkdir("history")
+    History.Prefix = "./history"

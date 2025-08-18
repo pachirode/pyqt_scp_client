@@ -35,7 +35,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./uploads/app-linux.bin
+        asset_path: ./uploads/ssh-client-linux.bin
         asset_name: ssh-tunnel-manager-linux-${{ github.ref_name }}
         asset_content_type: application/x-executable
     - name: upload windows
@@ -45,7 +45,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./uploads/app-windows.exe
+        asset_path: ./uploads/ssh-client-windows.exe
         asset_name: ssh-tunnel-manager-windows-${{ github.ref_name }}.exe
         asset_content_type: application/x-dosexec
 

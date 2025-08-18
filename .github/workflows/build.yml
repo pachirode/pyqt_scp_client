@@ -14,46 +14,26 @@ jobs:
     - build-windows
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: create release
       id: create_release
-      uses: actions/create-release@main
+      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
         draft: false
-        prerelease: false   
+        prerelease: false
     - name: download artifacts
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v3
       with:
         name: uploads
-    - name: upload linux
-      id: upload-linux
-      uses: actions/upload-release-asset@v1.0.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./uploads/app-linux.bin
-        asset_name: ssh-tunnel-manager-linux-${{ github.ref_name }}
-        asset_content_type: application/x-executable
-    - name: upload windows
-      id: upload-windows
-      uses: actions/upload-release-asset@v1.0.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./uploads/app-windows.exe
-        asset_name: ssh-tunnel-manager-windows-${{ github.ref_name }}.exe
-        asset_content_type: application/x-dosexec
 
   build-linux:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
       with:
         python-version: 3.11.13
@@ -61,17 +41,17 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install pyinstaller
-        pyinstaller --onefile --noconsole --name ssh-client-windows.exe app.py
+        pyinstaller --onefile --noconsole --name ssh-client-linux.bin app.py
     - name: upload artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: uploads
-        path: dist/app-linux.bin
+        path: dist/ssh-client-linux.bin
 
   build-windows:
-    runs-on: windows-2019
+    runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
       with:
         python-version: 3.11.13
@@ -81,7 +61,7 @@ jobs:
         pip install pyinstaller
         pyinstaller --onefile --noconsole --name ssh-client-windows.exe app.py
     - name: upload artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: uploads
-        path: dist/app-windows.exe
+        path: dist/ssh-client-windows.exe

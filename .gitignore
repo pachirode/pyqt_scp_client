@@ -1,3 +1,6 @@
 ./history
 .idea
 config.yaml
+build/
+dist/
+*.spec

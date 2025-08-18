@@ -10,7 +10,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from consts import ICONS
 
 
 class Ui_SSH(object):
@@ -39,7 +38,7 @@ class Ui_SSH(object):
         self.action_upload.setFocusPolicy(QtCore.Qt.NoFocus)
         self.action_upload.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(f"{ICONS.Prefix}/upload.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":icons/upload.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_upload.setIcon(icon)
         self.action_upload.setIconSize(QtCore.QSize(20, 20))
         self.action_upload.setFlat(True)
@@ -50,7 +49,7 @@ class Ui_SSH(object):
         self.action_download.setFocusPolicy(QtCore.Qt.NoFocus)
         self.action_download.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(f"{ICONS.Prefix}/download.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(":icons/download.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_download.setIcon(icon1)
         self.action_download.setIconSize(QtCore.QSize(20, 20))
         self.action_download.setFlat(True)
@@ -60,7 +59,7 @@ class Ui_SSH(object):
         self.action_settings.setMaximumSize(QtCore.QSize(32, 32))
         self.action_settings.setFocusPolicy(QtCore.Qt.NoFocus)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(f"{ICONS.Prefix}/config.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap(":icons/config.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_settings.setIcon(icon2)
         self.action_settings.setIconSize(QtCore.QSize(20, 20))
         self.action_settings.setFlat(True)

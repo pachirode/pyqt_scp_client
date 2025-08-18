@@ -21,7 +21,7 @@ class Builder:
             # '-F '
             '--clean '
             '--name "ssh_client" '
-            '--add-data "F:/code/pyqt_scp_client/icons/;./icons/" '
+            '--add-data "./icons/;./icons/" '
             'app.py'
         )
         print(cmd)

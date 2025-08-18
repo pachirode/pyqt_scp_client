@@ -13,9 +13,11 @@ from PyQt5.QtWidgets import QWidget, QApplication, QDialog, QMessageBox, QGridLa
 
 from deepdiff import DeepDiff
 
-from consts import CONFIG_FILE, LANGUAGE, History, ICONS
+from consts import CONFIG_FILE, LANGUAGE, History
 from ssh import Ui_SSH
 from sshconfig import Ui_SSHConfig
+
+import icons
 
 
 class SSHConfig(QDialog):
@@ -130,10 +132,10 @@ class SSH(QWidget):
         self.ssh_config.setWindowTitle(name)
         self.ssh_config.setModal(True)
         self.ui.name.setText(name)
-        self.ssh_config.icon = f"{ICONS.Prefix}/{name}.svg"
+        self.ssh_config.icon = f":icons/{name}.svg"
 
         if not os.path.exists(self.ssh_config.icon):
-            self.ssh_config.icon = f"{ICONS.Prefix}/debain.svg"
+            self.ssh_config.icon = f":icons/debain.svg"
 
         self.ui.icon.setPixmap(QPixmap(self.ssh_config.icon))
         self.ui.action_upload.clicked.connect(self.upload)

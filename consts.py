@@ -26,20 +26,9 @@ class CMDS:
     SCP_DOWNLOAD_TEMPLATE = " -r {}@{}:{} {}"
 
 
-class ICONS:
-    Prefix = "./"
-
-
 class History:
     Prefix = "./"
 
-
-if os.path.exists("./icons"):
-    ICONS.Prefix = "./icons/"
-elif os.path.exists("./_internal/icons"):
-    ICONS.Prefix = "./_internal/icons"
-else:
-    print("Icons folder not found")
 
 if os.path.exists("./history"):
     History.Prefix = "./history/"

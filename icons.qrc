@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="config.svg">icons/config.svg</file>
+        <file alias="debain.svg">icons/debain.svg</file>
+        <file alias="download.svg">icons/download.svg</file>
+        <file alias="file-open.svg">icons/file-open.svg</file>
+        <file alias="k8s.svg">icons/k8s.svg</file>
+        <file alias="k8s-node.svg">icons/k8s-node.svg</file>
+        <file alias="kube_pod.svg">icons/kube_pod.svg</file>
+        <file alias="upload.svg">icons/upload.svg</file>
+    </qresource>
+</RCC>

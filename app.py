@@ -89,26 +89,24 @@ class SSHConfig(QDialog):
         if not os.path.exists(self.ui.local_dir_edit.text()):
             os.makedirs(self.ui.local_dir_edit.text())
 
-        files = self.get_remote_files(sftp, self.ui.Remote_dir_edit.text())
-
-        for file in files:
-            local_path = os.path.join(self.ui.local_dir_edit.text(), os.path.basename(file))
-            sftp.get(file, local_path)
+        self.get_remote_files(sftp, self.ui.Remote_dir_edit.text(), self.ui.local_dir_edit.text())
 
         sftp.close()
         ssh.close()
 
         print("Download completed successfully")
 
-    def get_remote_files(self, sftp, remote_dir):
+    def get_remote_files(self, sftp, remote_dir, local_dir):
         file_list = sftp.listdir_attr(remote_dir)
         try:
             for file in file_list:
                 if stat.S_ISDIR(file.st_mode):
-                    dir = remote_dir + "/" + file.filename
-                    yield from self.get_remote_files(sftp, dir)
+                    if not os.path.exists(local_dir + "/" + file.filename):
+                        os.makedirs(local_dir + "/" + file.filename)
+                    self.get_remote_files(sftp, remote_dir + "/" + file.filename, local_dir + "/" + file.filename)
                 else:
-                    yield remote_dir + "/" + file.filename
+                    local_path = os.path.join(local_dir, file.filename)
+                    sftp.get(remote_dir + "/" + file.filename, local_path)
         except Exception as e:
             import traceback
             print(traceback.format_exc())

@@ -3,7 +3,9 @@ servers:
     ip: 192.168.29.131
     local_dir: ./
     remote_dir: /home/k8s/Templates
+    password: <PASSWORD>
   master:
     ip: 192.168.29.130
     local_dir: ./
     remote_dir: /home/master/Templates
+    password: <PASSWORD>

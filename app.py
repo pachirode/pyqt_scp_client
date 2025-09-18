@@ -21,10 +21,11 @@ import icons
 
 
 class SSHConfig(QDialog):
-    def __init__(self, parent, data, name):
+    def __init__(self, parent, data, name, password):
         super(SSHConfig, self).__init__(parent)
 
         self.name = name
+        self.password = password
         self.ui = Ui_SSHConfig()
         self.ui.setupUi(self)
         self.ui.Remote_ip_edit.setText(data.get("ip"))
@@ -40,7 +41,7 @@ class SSHConfig(QDialog):
     def upload(self):
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname=self.ui.Remote_ip_edit.text(), username=self.name, password="123456")
+        ssh.connect(hostname=self.ui.Remote_ip_edit.text(), username=self.name, password=self.password)
         sftp = ssh.open_sftp()
 
         if os.path.isfile(self.ui.local_dir_edit.text()):
@@ -120,13 +121,13 @@ class SSHConfig(QDialog):
 
 
 class SSH(QWidget):
-    def __init__(self, name, data):
+    def __init__(self, name, data, password):
         super(SSH, self).__init__()
 
         self.ui = Ui_SSH()
         self.ui.setupUi(self)
 
-        self.ssh_config = SSHConfig(self, data, name)
+        self.ssh_config = SSHConfig(self, data, name, password)
         self.ssh_config.setWindowTitle(name)
         self.ssh_config.setModal(True)
         self.ui.name.setText(name)
@@ -178,7 +179,8 @@ class SSHManager(QWidget):
 
         i = 0
         for i, server in enumerate(self.data["servers"]):
-            server = SSH(server, self.data["servers"][server])
+            password = self.data["servers"][server]["password"] if "password" in self.data["servers"][server] else "123456"
+            server = SSH(server, self.data["servers"][server], password)
             self.servers.append(server)
             self.grid.addWidget(server, i, 0)
 
